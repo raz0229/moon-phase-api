@@ -11,7 +11,7 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
 }
 
 getMoonPhase = async () => {
-  const browser = await puppeteer.launch({
+  const browser = await chrome.puppeteer.launch({
     args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
     defaultViewport: chrome.defaultViewport,
     executablePath: await chrome.executablePath,
