@@ -1,57 +1,32 @@
-import puppeteer from "puppeteer";
+import express from 'express'
+import bodyParser from 'body-parser';
+import { getMoonPhase } from './data/index.js';
+import cors from 'cors';
 
-// TODO: Now it's your turn to improve the scraper and make him get more data from the Quotes to Scrape website.
-// Here's a list of potential improvements you can make:
-// - Navigate between all pages using the "Next" button and fetch the quotes on all the pages
-// - Fetch the quote's tags (each quote has a list of tags)
-// - Scrape the author's about page (by clicking on the author's name on each quote)
-// - Categorize the quotes by tags or authors (it's not 100% related to the scraping itself, but that can be a good improvement)
+const app = express();
+const port = 3000;
 
-const getQuotes = async () => {
-  // Start a Puppeteer session with:
-  // - a visible browser (`headless: false` - easier to debug because you'll see the browser in action)
-  // - no default viewport (`defaultViewport: null` - website page will in full width and height)
-  const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-  });
+// const allowedOrigins = ['https://marvelapp.com'];
+// const options = {
+//   origin: allowedOrigins
+// };
 
-  // Open a new page
-  const page = await browser.newPage();
+// app.use(cors(options));
+app.use(cors())
 
-  // On this new page:
-  // - open the "http://quotes.toscrape.com/" website
-  // - wait until the dom content is loaded (HTML is ready)
-  await page.goto("http://quotes.toscrape.com/", {
-    waitUntil: "domcontentloaded",
-  });
+// Configuring body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-  // Get page data
-  const quotes = await page.evaluate(() => {
-    // Fetch the first element with class "quote"
-    // Get the displayed text and returns it
-    const quoteList = document.querySelectorAll(".quote");
+app.get('/getMoonPhase', async (req, res) => {
 
-    // Convert the quoteList to an iterable array
-    // For each quote fetch the text and author
-    return Array.from(quoteList).map((quote) => {
-      // Get the sub-elements from the previously fetched quote element
-      const text = quote.querySelector(".text").innerText;
-      const author = quote.querySelector(".author").innerText;
+    const response = await getMoonPhase();
+    
+    res.json(response);
+});
 
-      return { text, author };
-    });
-  });
+app.get('*', (req, res) => {
+    res.status(404).send('No Mooning here');
+});
 
-  // Display the quotes
-  console.log(quotes);
-
-  // Click on the "Next page" button
-  await page.click(".pager > .next > a");
-
-  // Close the browser
-  await browser.close();
-};
-
-// Start the scraping
-getQuotes();
+app.listen(port, () => console.log(`Moon Phase app listening on port ${port}!`));
