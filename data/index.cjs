@@ -1,23 +1,14 @@
-let chrome = {};
-let puppeteer;
-
-if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-  // running on the Vercel platform.
-  chrome = require('chrome-aws-lambda');
-  puppeteer = require('puppeteer-core');
-} else {
-  // running locally.
-  puppeteer = require('puppeteer-extra');
-}
+const chromium = require('chrome-aws-lambda');
+const puppeteer = require('puppeteer-core');
 
 getMoonPhase = async () => {
-  const browser = await chrome.puppeteer.launch({
-    args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
-    defaultViewport: chrome.defaultViewport,
-    executablePath: await chrome.executablePath,
+  const browser = await chromium.puppeteer.launch({
+    args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
     headless: true,
     ignoreHTTPSErrors: true,
-  });
+  })
 
   const page = await browser.newPage();
   await page.goto("https://phasesmoon.com/", {
