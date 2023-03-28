@@ -1,24 +1,29 @@
-import playwright from 'playwright';
-
+//import puppeteer from "puppeteer-extra";
+import chromium from 'chrome-aws-lambda';
 
 export const getMoonPhase = async () => {
-  const browser = await playwright.chromium.launch({
-    headless: true
-  });
+  const browser = await chromium.puppeteer.launch({
+    args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: true,
+    ignoreHTTPSErrors: true,
+  })
 
   const page = await browser.newPage();
-  await page.goto('https://phasesmoon.com/');
-  const moonPhase = await page.$eval('.dateselected', headerElm => {
+  await page.goto("https://phasesmoon.com/", {
+    waitUntil: "domcontentloaded",
+  });
 
-    const src = headerElm.nextElementSibling.src
-
+  const moonphase = await page.evaluate(() => {
+    const moon = document.querySelector('.dateselected');
     return {
-      src
+      src: moon.nextElementSibling.src
     }
   });
 
+
   await browser.close();
+  return moonphase;
+};
 
-  return moonPhase;
-
-}
