@@ -6,7 +6,7 @@ puppeteer.use(StealthPlugin());
 export const getMoonPhase = async () => {
   const browser = await puppeteer.launch({
     headless: true,
-    defaultViewport: null,
+    args: ['--no-sandbox']
   });
 
   const page = await browser.newPage();
