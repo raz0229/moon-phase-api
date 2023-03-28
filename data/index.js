@@ -1,28 +1,24 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import playwright from 'playwright';
 
-puppeteer.use(StealthPlugin());
 
 export const getMoonPhase = async () => {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox']
+  const browser = await playwright.chromium.launch({
+    headless: true
   });
 
   const page = await browser.newPage();
-  await page.goto("https://phasesmoon.com/", {
-    waitUntil: "domcontentloaded",
-  });
+  await page.goto('https://phasesmoon.com/');
+  const moonPhase = await page.$eval('.dateselected', headerElm => {
 
-  const moonphase = await page.evaluate(() => {
-    const moon = document.querySelector('.dateselected');
+    const src = headerElm.nextElementSibling.src
+
     return {
-      src: moon.nextElementSibling.src
+      src
     }
   });
 
-
   await browser.close();
-  return moonphase;
-};
 
+  return moonPhase;
+
+}
