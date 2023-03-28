@@ -1,7 +1,7 @@
-const express = require('express')
-const bodyParser = require('body-parser');
-const { getMoonPhase } = require('./data/index.cjs');
-const cors = require('cors');
+import express from 'express';
+import bodyParser from 'body-parser';
+import { getMoonPhase } from './data/index.js';
+import cors from 'cors';
 
 const app = express();
 const port = 3000;
